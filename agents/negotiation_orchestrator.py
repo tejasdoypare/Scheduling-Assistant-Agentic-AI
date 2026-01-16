@@ -64,7 +64,7 @@ Respond with JSON:
 }
             """
         
-        initial_decision = run_scheduler_agent(scheduler_input, scheduler_prompt)
+        initial_decision = run_scheduler_agent(scheduler_input, scheduler_prompt, self.api_key)
         print(f"Scheduler Initial Proposal:")
         print(f"   Decision: {initial_decision.get('decision')}")
         print(f"   Reasoning: {initial_decision.get('reasoning')}")
@@ -87,14 +87,28 @@ Respond with JSON:
                 proposed_slot = candidate_slots[slot_id] if isinstance(slot_id, int) else candidate_slots[0]
             except (IndexError, KeyError):
                 proposed_slot = candidate_slots[0] if candidate_slots else {
-                    "start_utc": "2026-01-16T10:00:00Z",
-                    "end_utc": "2026-01-16T11:00:00Z"
+                    "start": "2026-01-16T10:00:00Z",
+                    "end": "2026-01-16T11:00:00Z",
+                    "confidence_score": 0.5
                 }
         else:
             proposed_slot = candidate_slots[0] if candidate_slots else {
-                "start_utc": "2026-01-16T10:00:00Z", 
-                "end_utc": "2026-01-16T11:00:00Z"
+                "start": "2026-01-16T10:00:00Z", 
+                "end": "2026-01-16T11:00:00Z",
+                "confidence_score": 0.5
             }
+        
+        # Normalize slot keys (convert start_utc -> start, end_utc -> end if needed)
+        if "start_utc" in proposed_slot and "start" not in proposed_slot:
+            proposed_slot["start"] = proposed_slot["start_utc"]
+        if "end_utc" in proposed_slot and "end" not in proposed_slot:
+            proposed_slot["end"] = proposed_slot["end_utc"]
+        if "confidence_score" not in proposed_slot:
+            proposed_slot["confidence_score"] = proposed_slot.get("confidence", 0.7)
+        if "reasoning" not in proposed_slot:
+            proposed_slot["reasoning"] = initial_decision.get("reasoning", "Best available slot based on participant availability")
+        if "rank" not in proposed_slot:
+            proposed_slot["rank"] = 1
         
         # Negotiation rounds
         current_slot = proposed_slot
@@ -138,21 +152,30 @@ Respond with JSON:
             if all_accepted:
                 print(f"\nConsensus reached! Meeting scheduled.")
                 return {
+                    "success": True,
                     "status": "success",
                     "final_slot": current_slot,
-                    "rounds": round_num,
+                    "rounds_completed": round_num,
+                    "confidence_score": current_slot.get("confidence_score", 0.8),
+                    "consensus_reached": True,
                     "participant_responses": participant_responses,
-                    "negotiation_history": self.negotiation_history
+                    "negotiation_history": self.negotiation_history,
+                    "history": self.negotiation_history
                 }
             
             # If we're at max rounds, declare negotiation failed
             if round_num >= self.max_rounds:
                 print(f"\nNegotiation failed after {self.max_rounds} rounds")
                 return {
-                    "status": "failed", 
+                    "success": False,
+                    "status": "failed",
                     "reason": "max_rounds_exceeded",
+                    "rounds_completed": round_num,
+                    "confidence_score": 0.0,
+                    "consensus_reached": False,
                     "participant_responses": participant_responses,
-                    "negotiation_history": self.negotiation_history
+                    "negotiation_history": self.negotiation_history,
+                    "history": self.negotiation_history
                 }
             
             # Scheduler adapts based on participant feedback
@@ -167,9 +190,14 @@ Respond with JSON:
             if adaptation_result.get("decision") == "abort":
                 print("Scheduler decided to abort negotiation")
                 return {
+                    "success": False,
                     "status": "aborted",
                     "reason": adaptation_result.get("reasoning"),
-                    "negotiation_history": self.negotiation_history
+                    "rounds_completed": round_num,
+                    "confidence_score": 0.0,
+                    "consensus_reached": False,
+                    "negotiation_history": self.negotiation_history,
+                    "history": self.negotiation_history
                 }
             
             # Update current slot for next round
@@ -178,8 +206,13 @@ Respond with JSON:
                 print(f"New proposed time: {current_slot}")
         
         return {
+            "success": False,
             "status": "incomplete",
-            "negotiation_history": self.negotiation_history
+            "rounds_completed": self.max_rounds,
+            "confidence_score": 0.0,
+            "consensus_reached": False,
+            "negotiation_history": self.negotiation_history,
+            "history": self.negotiation_history
         }
     
     def _handle_no_initial_slots(self, meeting_request: dict):
@@ -203,9 +236,14 @@ Respond with JSON:
         
         if not all_alternatives:
             return {
+                "success": False,
                 "status": "failed",
                 "reason": "no_alternatives_suggested",
-                "negotiation_history": self.negotiation_history
+                "rounds_completed": 0,
+                "confidence_score": 0.0,
+                "consensus_reached": False,
+                "negotiation_history": self.negotiation_history,
+                "history": self.negotiation_history
             }
         
         # Scheduler evaluates alternatives
@@ -218,9 +256,15 @@ Respond with JSON:
         
         # Continue with normal negotiation flow
         return {
+            "success": True,
             "status": "alternatives_suggested",
             "selected_alternative": best_alternative,
-            "all_alternatives": all_alternatives
+            "all_alternatives": all_alternatives,
+            "rounds_completed": 0,
+            "confidence_score": best_alternative.get("confidence_score", 0.5),
+            "consensus_reached": False,
+            "negotiation_history": self.negotiation_history,
+            "history": self.negotiation_history
         }
     
     def _scheduler_adaptation(self, meeting_request: dict, current_slot: dict, 

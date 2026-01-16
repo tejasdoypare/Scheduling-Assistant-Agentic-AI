@@ -11,8 +11,16 @@ class EmailGenerator:
     Handles confirmation, reschedule requests, apologies, and alternatives.
     """
     
-    def __init__(self, api_key: str):
-        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)  # Higher temp for natural language
+    def __init__(self, api_key: str = None):
+        # Get API key from parameter or environment
+        if not api_key:
+            api_key = os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
+        
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash", 
+            temperature=0.7,  # Higher temp for natural language
+            google_api_key=api_key
+        )
         
     def generate_message(self, 
                         message_type: str, 

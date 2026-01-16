@@ -13,9 +13,17 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from app_logging import get_logger
+from ui.components.theme import apply_theme, theme_toggle_sidebar
 
 # Page config
 st.set_page_config(page_title="Create Meeting", page_icon="📝", layout="wide")
+
+# Apply theme
+apply_theme()
+
+# Sidebar with theme toggle
+with st.sidebar:
+    theme_toggle_sidebar()
 
 logger = get_logger()
 logger.log_app("Meeting page accessed", level="INFO")

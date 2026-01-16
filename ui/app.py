@@ -25,45 +25,49 @@ st.set_page_config(
 logger = init_logger()
 logger.log_app("Application started", level="INFO")
 
-# Custom CSS for better UI
-st.markdown("""
-<style>
-    .main-header {
-        font-size: 3rem;
-        font-weight: bold;
-        color: #1f77b4;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    .sub-header {
-        font-size: 1.2rem;
-        color: #666;
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    .feature-box {
-        background-color: #f0f2f6;
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin: 1rem 0;
-    }
-    .stButton>button {
-        width: 100%;
-        background-color: #1f77b4;
-        color: white;
-        font-weight: bold;
-        border-radius: 5px;
-        padding: 0.5rem 1rem;
-    }
-    .stButton>button:hover {
-        background-color: #145a8c;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Initialize session state for API key
+if 'google_api_key' not in st.session_state:
+    import os
+    st.session_state.google_api_key = os.getenv('GOOGLE_API_KEY', 'AIzaSyAz4mGir6Uh2fC090GSo1RpCZhZ7QJMrhY')
+
+# Import and apply theme
+from ui.components.theme import apply_theme, theme_toggle_sidebar
+apply_theme()
+
+# Sidebar with API Key Configuration and Theme Toggle
+with st.sidebar:
+    # Theme toggle at top
+    theme_toggle_sidebar()
+    
+    st.markdown("### ⚙️ Configuration")
+    
+    api_key_input = st.text_input(
+        "Google API Key",
+        value=st.session_state.google_api_key,
+        type="password",
+        help="Enter your Google Gemini API key from https://aistudio.google.com/app/apikey"
+    )
+    
+    if api_key_input:
+        st.session_state.google_api_key = api_key_input
+        st.success("✓ API Key configured")
+    elif not st.session_state.google_api_key:
+        st.warning("⚠️ No API key set. Negotiation will fail.")
+        st.info("Get your free API key: https://aistudio.google.com/app/apikey")
+    
+    st.divider()
+    
+    # System info
+    st.markdown("### ℹ️ System Info")
+    st.caption(f"Status: {'Ready' if st.session_state.google_api_key else 'Waiting for API Key'}")
+    st.caption("Version: 1.0 Phase 7")
+    st.caption("Powered by Google Gemini")
 
 # Main content
 st.markdown('<div class="main-header">📅 Scheduling Assistant</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">AI-Powered Multi-Agent Meeting Scheduler</div>', unsafe_allow_html=True)
+
+st.divider()
 
 # Introduction
 st.markdown("""

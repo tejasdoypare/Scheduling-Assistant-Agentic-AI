@@ -13,7 +13,12 @@ class ParticipantAgent:
     def __init__(self, name: str, profile: dict, api_key: str):
         self.name = name
         self.profile = profile
-        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3)
+        self.api_key = api_key
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash", 
+            temperature=0.3,
+            google_api_key=api_key
+        )
         
         # Extract key personality traits
         self.flexibility_score = profile.get("flexibility_score", 0.5)  # 0-1 scale

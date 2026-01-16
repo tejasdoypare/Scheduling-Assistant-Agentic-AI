@@ -23,9 +23,17 @@ from ui.components.visualizations import (
     create_confidence_evolution,
     create_slot_comparison
 )
+from ui.components.theme import apply_theme, theme_toggle_sidebar
 
 # Page config
 st.set_page_config(page_title="Run Negotiation", page_icon="🤝", layout="wide")
+
+# Apply theme
+apply_theme()
+
+# Sidebar with theme toggle
+with st.sidebar:
+    theme_toggle_sidebar()
 
 logger = get_logger()
 logger.log_app("Negotiation page accessed", level="INFO")
@@ -40,10 +48,26 @@ if 'meeting_request' not in st.session_state:
 if 'negotiation_result' not in st.session_state:
     st.session_state.negotiation_result = None
 
+if 'google_api_key' not in st.session_state:
+    st.session_state.google_api_key = ''
+
 st.title("🤝 Run Negotiation")
 st.markdown("Let AI agents negotiate the best meeting time.")
 
 st.divider()
+
+# Check API key
+if not st.session_state.google_api_key:
+    st.error("⚠️ No API Key Configured!")
+    st.markdown("""
+    Please configure your Google API Key first:
+    1. Go back to the **Home** page
+    2. Enter your API key in the sidebar (Configuration section)
+    3. Get a free key at: https://aistudio.google.com/app/apikey
+    """)
+    if st.button("Go to Home Page"):
+        st.switch_page("app.py")
+    st.stop()
 
 # Check prerequisites
 if not st.session_state.uploaded_calendars:
@@ -98,9 +122,11 @@ else:
                     'priorities': content.get('priorities', ['minimize_disruption'])
                 }
                 
-                # Get API key from environment or config
-                import os
-                api_key = os.getenv('GOOGLE_API_KEY', '')
+                # Get API key from session state
+                api_key = st.session_state.google_api_key
+                
+                if not api_key:
+                    raise ValueError("Google API key not configured")
                 
                 agent = ParticipantAgent(
                     name=name,
@@ -131,14 +157,36 @@ else:
             status_text.text("Step 3/4: Running multi-agent negotiation...")
             progress_bar.progress(75)
             
-            orchestrator = NegotiationOrchestrator(participants=participants)
+            orchestrator = NegotiationOrchestrator(api_key=api_key)
+            
+            # Add participants to orchestrator
+            for participant in participants:
+                orchestrator.add_participant(participant.name, participant.profile)
             
             meeting_request = st.session_state.meeting_request
             
+            # Create candidate slots from calendars (simplified for demo)
+            candidate_slots = [
+                {
+                    "start": "2026-01-17T10:00:00",
+                    "end": f"2026-01-17T{10 + meeting_request['duration_minutes']//60}:{meeting_request['duration_minutes']%60:02d}:00",
+                    "confidence_score": 0.8
+                },
+                {
+                    "start": "2026-01-17T14:00:00", 
+                    "end": f"2026-01-17T{14 + meeting_request['duration_minutes']//60}:{meeting_request['duration_minutes']%60:02d}:00",
+                    "confidence_score": 0.7
+                },
+                {
+                    "start": "2026-01-18T09:00:00",
+                    "end": f"2026-01-18T{9 + meeting_request['duration_minutes']//60}:{meeting_request['duration_minutes']%60:02d}:00", 
+                    "confidence_score": 0.6
+                }
+            ]
+            
             result = orchestrator.run_negotiation(
-                calendars=calendars,
-                meeting_duration_minutes=meeting_request['duration_minutes'],
-                max_rounds=meeting_request['max_negotiation_rounds']
+                meeting_request=meeting_request,
+                candidate_slots=candidate_slots
             )
             
             st.session_state.negotiation_result = result

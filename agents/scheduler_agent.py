@@ -3,8 +3,16 @@ from langchain_core.prompts import PromptTemplate
 import json
 import os
 
-def run_scheduler_agent(input_payload: dict, prompt_text: str):
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
+def run_scheduler_agent(input_payload: dict, prompt_text: str, api_key: str = None):
+    # Get API key from parameter or environment
+    if not api_key:
+        api_key = os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
+    
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash", 
+        temperature=0,
+        google_api_key=api_key
+    )
 
     prompt = PromptTemplate(
         template=prompt_text + "\n\nINPUT:\n{input}\nOUTPUT:",

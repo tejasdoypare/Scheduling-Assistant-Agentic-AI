@@ -15,9 +15,17 @@ sys.path.insert(0, str(project_root))
 
 from app_logging import get_logger
 from messaging.email_generator import EmailGenerator
+from ui.components.theme import apply_theme, theme_toggle_sidebar
 
 # Page config
 st.set_page_config(page_title="View Messages", page_icon="✉️", layout="wide")
+
+# Apply theme
+apply_theme()
+
+# Sidebar with theme toggle
+with st.sidebar:
+    theme_toggle_sidebar()
 
 logger = get_logger()
 logger.log_app("Messages page accessed", level="INFO")
@@ -59,7 +67,12 @@ else:
             if st.button("✨ Generate Messages", type="primary", use_container_width=True):
                 with st.spinner("Generating messages..."):
                     try:
-                        email_generator = EmailGenerator()
+                        # Get API key from session state
+                        api_key = st.session_state.get('google_api_key', '')
+                        if not api_key:
+                            raise ValueError("Google API key not configured")
+                        
+                        email_generator = EmailGenerator(api_key=api_key)
                         
                         result = st.session_state.negotiation_result
                         meeting = st.session_state.meeting_request
@@ -82,10 +95,14 @@ else:
                                 'reason': 'Unable to find a suitable time slot after negotiation'
                             }
                         
+                        # Generate message for first participant (or all participants)
+                        recipient_name = meeting['participants'][0] if meeting['participants'] else "Team"
+                        
                         # Generate message
                         message = email_generator.generate_message(
                             message_type=message_type,
                             context=context,
+                            recipient_name=recipient_name,
                             tone="professional"
                         )
                         
@@ -204,11 +221,21 @@ else:
             if st.button("🔄 Regenerate with New Tone", use_container_width=True):
                 with st.spinner("Regenerating message..."):
                     try:
-                        email_generator = EmailGenerator()
+                        # Get API key from session state
+                        api_key = st.session_state.get('google_api_key', '')
+                        if not api_key:
+                            raise ValueError("Google API key not configured")
+                        
+                        email_generator = EmailGenerator(api_key=api_key)
+                        
+                        # Get recipient name from context
+                        meeting = st.session_state.meeting_request
+                        recipient_name = meeting['participants'][0] if meeting.get('participants') else "Team"
                         
                         new_message = email_generator.generate_message(
                             message_type=messages_data['type'],
                             context=messages_data['context'],
+                            recipient_name=recipient_name,
                             tone=new_tone
                         )
                         
