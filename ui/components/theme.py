@@ -46,7 +46,7 @@ def apply_theme():
             
             .sub-header {
                 font-size: 1.2rem;
-                color: #b0b0b0 !important;
+                color: #e0e0e0 !important;
                 text-align: center;
                 margin-bottom: 2rem;
             }
@@ -125,7 +125,7 @@ def apply_theme():
             }
             
             [data-testid="stMetricLabel"] {
-                color: #b0b0b0 !important;
+                color: #d0d0d0 !important;
             }
             
             /* Info/Warning/Error boxes */
@@ -163,12 +163,12 @@ def apply_theme():
             
             /* Labels and captions */
             .stCaption, label {
-                color: #b0b0b0 !important;
+                color: #d0d0d0 !important;
             }
             
             /* Markdown text */
             .stMarkdown p, .stMarkdown li {
-                color: #e0e0e0 !important;
+                color: #f0f0f0 !important;
             }
             
             /* File uploader */

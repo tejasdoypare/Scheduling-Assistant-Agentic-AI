@@ -51,27 +51,43 @@ with st.sidebar:
     
     st.markdown("### ⚙️ Configuration")
     
-    api_key_input = st.text_input(
-        "Google API Key",
-        value=st.session_state.google_api_key,
-        type="password",
-        help="Enter your Google Gemini API key from https://aistudio.google.com/app/apikey"
-    )
+    # Only show API key input if not configured in secrets
+    # This hides it in production deployment where secrets are set
+    show_api_input = False
+    try:
+        # Check if running on Streamlit Cloud with secrets
+        if not st.secrets.get("GOOGLE_API_KEY"):
+            show_api_input = True
+    except:
+        # Local development - show input
+        show_api_input = True
     
-    if api_key_input:
-        st.session_state.google_api_key = api_key_input
-        st.success("✓ API Key configured")
-    elif not st.session_state.google_api_key:
-        st.warning("⚠️ No API key set. Negotiation will fail.")
-        st.info("Get your free API key: https://aistudio.google.com/app/apikey")
+    if show_api_input and not st.session_state.google_api_key:
+        api_key_input = st.text_input(
+            "Google API Key",
+            value="",
+            type="password",
+            help="Enter your Google Gemini API key from https://aistudio.google.com/app/apikey"
+        )
+        
+        if api_key_input:
+            st.session_state.google_api_key = api_key_input
+            st.success("✓ API Key configured")
+        else:
+            st.warning("⚠️ No API key set. Negotiation will fail.")
+            st.info("Get your free API key: https://aistudio.google.com/app/apikey")
+    else:
+        if st.session_state.google_api_key:
+            st.success("✓ API Key configured")
+        else:
+            st.error("⚠️ No API key found")
     
     st.divider()
     
     # System info
     st.markdown("### ℹ️ System Info")
     st.caption(f"Status: {'Ready' if st.session_state.google_api_key else 'Waiting for API Key'}")
-    st.caption("Version: 1.0 Phase 7")
-    st.caption("Powered by Google Gemini")
+    st.caption("Version: 1.0")
 
 # Main content
 st.markdown('<div class="main-header">📅 Scheduling Assistant</div>', unsafe_allow_html=True)
@@ -178,9 +194,8 @@ with col4:
 # Footer
 st.divider()
 st.markdown("""
-<div style="text-align: center; color: #666; padding: 2rem 0;">
-    <p>Powered by Google Gemini AI • Built with Streamlit</p>
-    <p>Phase 7: UI + Logging Complete</p>
+<div style="text-align: center; padding: 2rem 0;">
+    <p style="color: #999;">Built with Streamlit</p>
 </div>
 """, unsafe_allow_html=True)
 
