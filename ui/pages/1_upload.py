@@ -179,7 +179,75 @@ else:
 # Footer
 st.divider()
 st.markdown("""
-<div style="text-align: center; color: #666; padding: 1rem 0;">
-    <p>Tip: Calendar files should contain availability, working hours, and timezone information</p>
+<div style="text-align: center; padding: 1rem 0;">
+    <p style="color: #888; margin-bottom: 1rem;">💡 Tip: Calendar files should contain availability, working hours, and timezone information</p>
 </div>
 """, unsafe_allow_html=True)
+
+# Sample data format examples
+with st.expander("📋 See Sample Calendar Format Examples", expanded=False):
+    st.markdown("### Example Calendar Data Format")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Person A - CSV Format**")
+        st.code("""name,email,timezone,working_hours_start,working_hours_end,available_dates,priority
+Alice Johnson,alice@company.com,America/New_York,09:00,17:00,"2026-01-20,2026-01-21,2026-01-22",high""", language="csv")
+        
+        st.markdown("**Person A - JSON Format**")
+        st.code("""{
+  "name": "Alice Johnson",
+  "email": "alice@company.com",
+  "timezone": "America/New_York",
+  "working_hours": {
+    "start": "09:00",
+    "end": "17:00"
+  },
+  "available_dates": [
+    "2026-01-20",
+    "2026-01-21",
+    "2026-01-22"
+  ],
+  "busy_slots": [
+    {
+      "date": "2026-01-20",
+      "start": "10:00",
+      "end": "11:00"
+    }
+  ],
+  "priority": "high"
+}""", language="json")
+    
+    with col2:
+        st.markdown("**Person B - CSV Format**")
+        st.code("""name,email,timezone,working_hours_start,working_hours_end,available_dates,priority
+Bob Smith,bob@company.com,Asia/Tokyo,08:00,16:00,"2026-01-20,2026-01-21,2026-01-23",medium""", language="csv")
+        
+        st.markdown("**Person B - JSON Format**")
+        st.code("""{
+  "name": "Bob Smith",
+  "email": "bob@company.com",
+  "timezone": "Asia/Tokyo",
+  "working_hours": {
+    "start": "08:00",
+    "end": "16:00"
+  },
+  "available_dates": [
+    "2026-01-20",
+    "2026-01-21",
+    "2026-01-23"
+  ],
+  "busy_slots": [
+    {
+      "date": "2026-01-21",
+      "start": "13:00",
+      "end": "14:00"
+    }
+  ],
+  "priority": "medium"
+}""", language="json")
+    
+    st.info("📝 **Required Fields**: name, email, timezone, working_hours, available_dates")
+    st.success("✨ **Optional Fields**: busy_slots, priority, preferences")
+
