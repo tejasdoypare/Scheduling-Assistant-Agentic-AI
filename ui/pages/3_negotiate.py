@@ -56,18 +56,34 @@ st.markdown("Let AI agents negotiate the best meeting time.")
 
 st.divider()
 
-# Check API key
+# API Key Configuration Section (Prominent)
 if not st.session_state.google_api_key:
-    st.error("⚠️ No API Key Configured!")
-    st.markdown("""
-    Please configure your Google API Key first:
-    1. Go back to the **Home** page
-    2. Enter your API key in the sidebar (Configuration section)
-    3. Get a free key at: https://aistudio.google.com/app/apikey
-    """)
-    if st.button("Go to Home Page"):
-        st.switch_page("app.py")
-    st.stop()
+    st.warning("🔑 **Google API Key Required**")
+    st.markdown("Please enter your Google Gemini API key to start the negotiation process.")
+    
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        api_key_input = st.text_input(
+            "Google API Key",
+            value="",
+            type="password",
+            placeholder="Enter your Google Gemini API key here...",
+            help="Get your free API key from Google AI Studio",
+            key="negotiate_api_key_input"
+        )
+    
+    with col2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🔗 Get an API key", use_container_width=True):
+            st.markdown("[Open Google AI Studio](https://aistudio.google.com/app/apikey)")
+    
+    if api_key_input:
+        st.session_state.google_api_key = api_key_input
+        st.success("✅ API Key configured! You can now run negotiations.")
+        st.rerun()
+    else:
+        st.info("💡 **Tip**: Get your free Google Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)")
+        st.stop()
 
 # Check prerequisites
 if not st.session_state.uploaded_calendars:

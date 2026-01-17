@@ -193,7 +193,7 @@ with st.expander("📋 See Sample Calendar Format Examples", expanded=False):
     with col1:
         st.markdown("**Person A - CSV Format**")
         st.code("""name,email,timezone,working_hours_start,working_hours_end,available_dates,priority
-Alice ,alice@company.com,America/New_York,09:00,17:00,"2026-01-20,2026-01-21,2026-01-22",high""", language="csv")
+Alice,alice@company.com,America/New_York,09:00,17:00,"2026-01-20,2026-01-21,2026-01-22",high""", language="csv")
         
         st.markdown("**Person A - JSON Format**")
         st.code("""{
@@ -222,7 +222,7 @@ Alice ,alice@company.com,America/New_York,09:00,17:00,"2026-01-20,2026-01-21,202
     with col2:
         st.markdown("**Person B - CSV Format**")
         st.code("""name,email,timezone,working_hours_start,working_hours_end,available_dates,priority
-Bob ,bob@company.com,Asia/Tokyo,08:00,16:00,"2026-01-20,2026-01-21,2026-01-23",medium""", language="csv")
+Bob,bob@company.com,Asia/Tokyo,08:00,16:00,"2026-01-20,2026-01-21,2026-01-23",medium""", language="csv")
         
         st.markdown("**Person B - JSON Format**")
         st.code("""{
