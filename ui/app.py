@@ -25,62 +25,18 @@ st.set_page_config(
 logger = init_logger()
 logger.log_app("Application started", level="INFO")
 
-# Initialize session state for API key
+# Initialize session state for API key (NEVER auto-load - require explicit entry)
 if 'google_api_key' not in st.session_state:
-    import os
-    # Try to get API key from multiple sources (priority order):
-    # 1. Streamlit secrets (production on Streamlit Cloud)
-    # 2. Environment variable (local development)
-    # 3. Empty string (user must provide)
-    api_key = ''
-    try:
-        api_key = st.secrets.get("GOOGLE_API_KEY", "")
-    except (FileNotFoundError, KeyError):
-        api_key = os.getenv('GOOGLE_API_KEY', '')
-    
-    st.session_state.google_api_key = api_key
+    st.session_state.google_api_key = ''
 
 # Import and apply theme
 from ui.components.theme import apply_theme, theme_toggle_sidebar
 apply_theme()
 
-# Sidebar with API Key Configuration and Theme Toggle
+# Sidebar with Theme Toggle (removed API key config from sidebar)
 with st.sidebar:
     # Theme toggle at top
     theme_toggle_sidebar()
-    
-    st.markdown("### ⚙️ Configuration")
-    
-    # Only show API key input if not configured in secrets
-    # This hides it in production deployment where secrets are set
-    show_api_input = False
-    try:
-        # Check if running on Streamlit Cloud with secrets
-        if not st.secrets.get("GOOGLE_API_KEY"):
-            show_api_input = True
-    except:
-        # Local development - show input
-        show_api_input = True
-    
-    if show_api_input and not st.session_state.google_api_key:
-        api_key_input = st.text_input(
-            "Google API Key",
-            value="",
-            type="password",
-            help="Enter your Google Gemini API key from https://aistudio.google.com/app/apikey"
-        )
-        
-        if api_key_input:
-            st.session_state.google_api_key = api_key_input
-            st.success("✓ API Key configured")
-        else:
-            st.warning("⚠️ No API key set. Negotiation will fail.")
-            st.info("Get your free API key: https://aistudio.google.com/app/apikey")
-    else:
-        if st.session_state.google_api_key:
-            st.success("✓ API Key configured")
-        else:
-            st.error("⚠️ No API key found")
     
     st.divider()
     
