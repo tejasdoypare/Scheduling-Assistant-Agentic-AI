@@ -37,6 +37,10 @@ if 'meeting_request' not in st.session_state:
 if 'negotiation_result' not in st.session_state:
     st.session_state.negotiation_result = None
 
+# Initialize message-specific API key flag
+if 'messages_api_key_entered' not in st.session_state:
+    st.session_state.messages_api_key_entered = False
+
 if 'generated_messages' not in st.session_state:
     st.session_state.generated_messages = None
 
@@ -63,8 +67,8 @@ else:
     if not st.session_state.generated_messages:
         st.markdown("### 📧 Generate Messages")
         
-        # API Key check for message generation
-        if not st.session_state.google_api_key:
+        # API Key check for message generation (Always show until explicitly entered)
+        if not st.session_state.messages_api_key_entered:
             st.warning("🔑 **Google API Key Required for Message Generation**")
             st.markdown("Please enter your Google Gemini API key to generate professional messages.")
             
@@ -86,6 +90,7 @@ else:
             
             if api_key_input:
                 st.session_state.google_api_key = api_key_input
+                st.session_state.messages_api_key_entered = True
                 st.success("✅ API Key configured! You can now generate messages.")
                 st.rerun()
             else:

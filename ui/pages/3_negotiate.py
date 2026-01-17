@@ -48,6 +48,10 @@ if 'meeting_request' not in st.session_state:
 if 'negotiation_result' not in st.session_state:
     st.session_state.negotiation_result = None
 
+# Initialize negotiation-specific API key flag
+if 'negotiation_api_key_entered' not in st.session_state:
+    st.session_state.negotiation_api_key_entered = False
+
 if 'google_api_key' not in st.session_state:
     st.session_state.google_api_key = ''
 
@@ -56,8 +60,8 @@ st.markdown("Let AI agents negotiate the best meeting time.")
 
 st.divider()
 
-# API Key Configuration Section (Prominent)
-if not st.session_state.google_api_key:
+# API Key Configuration Section (Always show until explicitly entered on this page)
+if not st.session_state.negotiation_api_key_entered:
     st.warning("🔑 **Google API Key Required**")
     st.markdown("Please enter your Google Gemini API key to start the negotiation process.")
     
@@ -79,6 +83,7 @@ if not st.session_state.google_api_key:
     
     if api_key_input:
         st.session_state.google_api_key = api_key_input
+        st.session_state.negotiation_api_key_entered = True
         st.success("✅ API Key configured! You can now run negotiations.")
         st.rerun()
     else:
