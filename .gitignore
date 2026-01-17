@@ -1,12 +1,59 @@
+# Python
 __pycache__/
-.env
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
+.venv/
 venv/
+ENV/
+env/
+.virtualenv/
+
+# Environment Variables & Secrets
+.env
 .env.local
+.env.production
+.streamlit/secrets.toml
+
+# Logs
 *.log
+logs/*.log
+app_logging/*.log
+
+# Jupyter Notebooks
 .ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
 .DS_Store
 .idea/
 .vscode/
-__pycache__/
-*.pyc
-data/
+*.swp
+*.swo
+*~
+
+# Data (exclude large datasets but keep structure)
+data/scenarios/*/
+!data/scenarios/.gitkeep
+data/*.csv
+data/*.json
+data/*.xlsx
+
+# Build & Distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# OS
+Thumbs.db
+.DS_Store

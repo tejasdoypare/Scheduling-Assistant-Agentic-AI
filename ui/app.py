@@ -28,7 +28,17 @@ logger.log_app("Application started", level="INFO")
 # Initialize session state for API key
 if 'google_api_key' not in st.session_state:
     import os
-    st.session_state.google_api_key = os.getenv('GOOGLE_API_KEY', 'AIzaSyAz4mGir6Uh2fC090GSo1RpCZhZ7QJMrhY')
+    # Try to get API key from multiple sources (priority order):
+    # 1. Streamlit secrets (production on Streamlit Cloud)
+    # 2. Environment variable (local development)
+    # 3. Empty string (user must provide)
+    api_key = ''
+    try:
+        api_key = st.secrets.get("GOOGLE_API_KEY", "")
+    except (FileNotFoundError, KeyError):
+        api_key = os.getenv('GOOGLE_API_KEY', '')
+    
+    st.session_state.google_api_key = api_key
 
 # Import and apply theme
 from ui.components.theme import apply_theme, theme_toggle_sidebar
