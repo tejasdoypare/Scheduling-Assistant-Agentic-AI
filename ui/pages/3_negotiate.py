@@ -48,10 +48,6 @@ if 'meeting_request' not in st.session_state:
 if 'negotiation_result' not in st.session_state:
     st.session_state.negotiation_result = None
 
-# Initialize negotiation-specific API key flag
-if 'negotiation_api_key_entered' not in st.session_state:
-    st.session_state.negotiation_api_key_entered = False
-
 if 'google_api_key' not in st.session_state:
     st.session_state.google_api_key = ''
 
@@ -60,35 +56,13 @@ st.markdown("Let AI agents negotiate the best meeting time.")
 
 st.divider()
 
-# API Key Configuration Section (Always show until explicitly entered on this page)
-if not st.session_state.negotiation_api_key_entered:
-    st.warning("🔑 **Google API Key Required**")
-    st.markdown("Please enter your Google Gemini API key to start the negotiation process.")
-    
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        api_key_input = st.text_input(
-            "Google API Key",
-            value="",
-            type="password",
-            placeholder="Enter your Google Gemini API key here...",
-            help="Get your free API key from Google AI Studio",
-            key="negotiate_api_key_input"
-        )
-    
-    with col2:
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🔗 Get an API key", use_container_width=True):
-            st.markdown("[Open Google AI Studio](https://aistudio.google.com/app/apikey)")
-    
-    if api_key_input:
-        st.session_state.google_api_key = api_key_input
-        st.session_state.negotiation_api_key_entered = True
-        st.success("✅ API Key configured! You can now run negotiations.")
-        st.rerun()
-    else:
-        st.info("💡 **Tip**: Get your free Google Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)")
-        st.stop()
+# Check API key first
+if not st.session_state.google_api_key:
+    st.error("🔑 **API Key Required**")
+    st.markdown("Please go back to the Home page and enter your Google Gemini API key first.")
+    if st.button("⬅️ Go to Home Page", type="primary"):
+        st.switch_page("app.py")
+    st.stop()
 
 # Check prerequisites
 if not st.session_state.uploaded_calendars:

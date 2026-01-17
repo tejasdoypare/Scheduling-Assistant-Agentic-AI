@@ -51,6 +51,38 @@ st.markdown('<div class="sub-header">AI-Powered Multi-Agent Meeting Scheduler</d
 
 st.divider()
 
+# API Key Configuration Section (First thing on home page)
+if not st.session_state.google_api_key:
+    st.markdown("### 🔑 Get Started - Enter Your API Key")
+    st.markdown("To use the AI-powered scheduling features, please enter your Google Gemini API key.")
+    
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        api_key_input = st.text_input(
+            "Google API Key",
+            value="",
+            type="password",
+            placeholder="Enter your Google Gemini API key here...",
+            help="Get your free API key from Google AI Studio",
+            key="home_api_key_input"
+        )
+    
+    with col2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.link_button("🔗 Get an API key", "https://aistudio.google.com/app/apikey", use_container_width=True)
+    
+    if api_key_input:
+        st.session_state.google_api_key = api_key_input
+        st.success("✅ API Key configured! You can now use all features.")
+        st.rerun()
+    else:
+        st.info("💡 **Tip**: Get your free Google Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)")
+    
+    st.divider()
+else:
+    st.success("✅ **API Key Configured** - You're ready to start scheduling!")
+    st.divider()
+
 # Introduction
 st.markdown("""
 ### Welcome to the Scheduling Assistant!

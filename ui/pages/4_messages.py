@@ -38,8 +38,8 @@ if 'negotiation_result' not in st.session_state:
     st.session_state.negotiation_result = None
 
 # Initialize message-specific API key flag
-if 'messages_api_key_entered' not in st.session_state:
-    st.session_state.messages_api_key_entered = False
+if 'google_api_key' not in st.session_state:
+    st.session_state.google_api_key = ''
 
 if 'generated_messages' not in st.session_state:
     st.session_state.generated_messages = None
@@ -49,9 +49,13 @@ st.markdown("Professional communication for all participants.")
 
 st.divider()
 
-# API Key Configuration Section (if needed for message generation)
-if 'google_api_key' not in st.session_state:
-    st.session_state.google_api_key = ''
+# Check API key first
+if not st.session_state.google_api_key:
+    st.error("🔑 **API Key Required**")
+    st.markdown("Please go back to the Home page and enter your Google Gemini API key first.")
+    if st.button("⬅️ Go to Home Page", type="primary"):
+        st.switch_page("app.py")
+    st.stop()
 
 # Check prerequisites
 if not st.session_state.meeting_request:
@@ -66,36 +70,6 @@ else:
     # Generate messages button
     if not st.session_state.generated_messages:
         st.markdown("### 📧 Generate Messages")
-        
-        # API Key check for message generation (Always show until explicitly entered)
-        if not st.session_state.messages_api_key_entered:
-            st.warning("🔑 **Google API Key Required for Message Generation**")
-            st.markdown("Please enter your Google Gemini API key to generate professional messages.")
-            
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                api_key_input = st.text_input(
-                    "Google API Key",
-                    value="",
-                    type="password",
-                    placeholder="Enter your Google Gemini API key here...",
-                    help="Get your free API key from Google AI Studio",
-                    key="messages_api_key_input"
-                )
-            
-            with col2:
-                st.markdown("<br>", unsafe_allow_html=True)
-                if st.button("🔗 Get an API key", use_container_width=True):
-                    st.markdown("[Open Google AI Studio](https://aistudio.google.com/app/apikey)")
-            
-            if api_key_input:
-                st.session_state.google_api_key = api_key_input
-                st.session_state.messages_api_key_entered = True
-                st.success("✅ API Key configured! You can now generate messages.")
-                st.rerun()
-            else:
-                st.info("💡 **Tip**: Get your free Google Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)")
-                st.stop()
         
         st.info("Generate professional emails to send to all participants based on the negotiation outcome.")
         
