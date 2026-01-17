@@ -33,13 +33,13 @@ def apply_theme():
             
             /* Headers */
             h1, h2, h3, h4, h5, h6 {
-                color: #4CAF50 !important;
+                color: #81C784 !important;
             }
             
             .main-header {
                 font-size: 3rem;
                 font-weight: bold;
-                color: #4CAF50 !important;
+                color: #81C784 !important;
                 text-align: center;
                 margin-bottom: 1rem;
             }
@@ -97,7 +97,7 @@ def apply_theme():
             section[data-testid="stSidebar"] h1,
             section[data-testid="stSidebar"] h2,
             section[data-testid="stSidebar"] h3 {
-                color: #4CAF50 !important;
+                color: #81C784 !important;
             }
             
             /* Text inputs */
@@ -121,11 +121,23 @@ def apply_theme():
             
             /* Metrics */
             [data-testid="stMetricValue"] {
-                color: #4CAF50 !important;
+                color: #81C784 !important;
             }
             
             [data-testid="stMetricLabel"] {
-                color: #d0d0d0 !important;
+                color: #e0e0e0 !important;
+            }
+            
+            [data-testid="stMetricDelta"] {
+                color: #81C784 !important;
+            }
+            
+            /* Metric container */
+            [data-testid="metric-container"] {
+                background-color: rgba(45, 55, 72, 0.5) !important;
+                border: 1px solid rgba(76, 175, 80, 0.3) !important;
+                border-radius: 8px !important;
+                padding: 1rem !important;
             }
             
             /* Info/Warning/Error boxes */

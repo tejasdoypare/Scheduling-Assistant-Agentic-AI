@@ -195,7 +195,7 @@ with col4:
 st.divider()
 st.markdown("""
 <div style="text-align: center; padding: 2rem 0;">
-    <p style="color: #999;">Built with Streamlit</p>
+    <p style="color: #aaa;">Built with Streamlit • LLM-Powered Agentic Scheduling Assistant</p>
 </div>
 """, unsafe_allow_html=True)
 
