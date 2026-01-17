@@ -285,9 +285,9 @@ else:
         st.divider()
         
         # Final slot
+        st.markdown("### 🎯 Recommended Meeting Time")
+        
         if result.get('final_slot'):
-            st.markdown("### 🎯 Recommended Meeting Time")
-            
             final_slot = result['final_slot']
             
             col1, col2 = st.columns(2)
@@ -307,6 +307,36 @@ else:
                 
                 **Rank**: #{final_slot.get('rank', 'N/A')}
                 """)
+        else:
+            # No final slot - show best from proposals
+            if 'history' in result and result['history']:
+                st.warning("⚠️ No final consensus reached. Showing best available slot:")
+                last_round = result['history'][-1]
+                if 'proposals' in last_round and last_round['proposals']:
+                    # Get highest confidence proposal
+                    best_proposal = max(last_round['proposals'], key=lambda x: x.get('confidence_score', 0))
+                    
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.info(f"""
+                        **Start Time**: {best_proposal.get('start', 'N/A')}
+                        
+                        **End Time**: {best_proposal.get('end', 'N/A')}
+                        
+                        **Confidence**: {best_proposal.get('confidence_score', 0):.0%}
+                        """)
+                    
+                    with col2:
+                        st.info(f"""
+                        **Reasoning**: {best_proposal.get('reasoning', 'Best available time slot')}
+                        
+                        **Status**: Pending consensus
+                        """)
+                else:
+                    st.error("No meeting proposals were generated. Please try again with different parameters.")
+            else:
+                st.error("Negotiation failed to produce results. Please check logs and try again.")
         
         st.divider()
         
